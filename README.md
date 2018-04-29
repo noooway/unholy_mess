@@ -2,7 +2,7 @@
 an overview of current plans for a project, current activities, subprojects and rationale behind them.
 
 <p align="center">
-<a href="https://github.com/noooway/unholy_mess/blob/master/doc/scrshot.png"><img src="https://github.com/noooway/unholy_mess/blob/master/doc/scrshot.png" width="300"/></a>
+<a href="https://github.com/noooway/unholy_mess/blob/master/doc/scrshot.png"><img src="https://github.com/noooway/unholy_mess/blob/master/doc/scrshot.png" width="500"/></a>
 </p>
 
 Several points I hope to implement are: 
