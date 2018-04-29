@@ -17,17 +17,9 @@ in the project big picture.
 
 ## Installation
 
-1. Obtain [LÖVE](https://love2d.org/) interpreter.
-On Debian GNU/Linux:
+Obtain [LÖVE](https://love2d.org/) interpreter, clone the repository, run the program:
 ```bash
 sudo apt-get install love2d
-```
-2. Clone repository:
-```bash
 git clone https://github.com/noooway/unholy_mess
-```
-
-3. Run the program:
-```bash
 love unholy_mess
 ```
