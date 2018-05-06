@@ -25,18 +25,22 @@ ProjectsArea.__index = ProjectsArea
 function ProjectsArea:new( o )
    o = o or {}
    setmetatable( o, self )
+   o.bounding_frame_full_screen_height = 0.85 * screen_h
+   o.bounding_frame_half_screen_height = 0.45 * screen_h
    o.bounding_frame = ui.Frame:new{
       position = vector( 0.05 * screen_w, 0.05 * screen_h ),
       width = 0.9 * screen_w,
-      height = 0.45 * screen_h,
+      height = o.bounding_frame_full_screen_height,
       draw_frame = true,
       scissors = true
    }
    o.timeline = Timeline:new()
+   o.projects_frame_full_screen_height = 0.75 * screen_h
+   o.projects_frame_half_screen_height = 0.35 * screen_h
    o.projects_frame = ui.Frame:new{
       position = vector( 0.05 * screen_w, 0.15 * screen_h ),
       width = 0.9 * screen_w,
-      height = 0.35 * screen_h,
+      height = o.projects_frame_full_screen_height,
       draw_frame = true,
       scissors = true
    }
@@ -45,12 +49,39 @@ function ProjectsArea:new( o )
       width = o.projects_frame.width,
       height = o.projects_frame.height
    }
+   o.bounding_frame.zoom = ui.Scroll:new{
+      position = o.bounding_frame.position,
+      width = o.bounding_frame.width,
+      height = o.bounding_frame.height
+   }
+   -- zoom levels
+   o.zoom_levels = { "5years", "3years",
+		     "year", "halfyear",
+		     "4month", "3months",
+		     "monthandahalf", "month",
+		     "2weeks", "week",
+		     "3days", "day" }
+   o.current_zoom_level = o.zoom_levels[8] -- month
+   o.bounding_frame.zoom.total_scroll_distance = 8
    -- todo: place inside o.bounding_frame
    o.lowest_button = o.lowest_button or 0
    o.widget_type = "ProjectsArea"
    return o
 end
 
+function ProjectsArea:resize_to_full_screen()
+   self.bounding_frame.height = self.bounding_frame_full_screen_height
+   self.projects_frame.height = self.projects_frame_full_screen_height
+   self.projects_frame.drag_and_drop.height = self.projects_frame.height
+   self.bounding_frame.zoom.height = self.bounding_frame.height
+end
+
+function ProjectsArea:resize_to_half_screen()
+   self.bounding_frame.height = self.bounding_frame_half_screen_height
+   self.projects_frame.height = self.projects_frame_half_screen_height
+   self.projects_frame.drag_and_drop.height = self.projects_frame.height
+   self.bounding_frame.zoom.height = self.bounding_frame.height
+end
 
 function ProjectsArea:recursively_add_projects( proj )
    local project_button_height = 0.05 * screen_h
@@ -82,11 +113,12 @@ end
 
 function ProjectsArea:update( dt )
    self.bounding_frame:update( dt )
+   self.bounding_frame.zoom:update( dt )
    self.timeline:update( self.projects_frame.drag_and_drop.current_drag_distance,
 			 self.projects_frame.drag_and_drop.total_drag_distance,
 			 dt )
    self.projects_frame.drag_and_drop:update( dt )
-   self:update_project_buttons_with_drag( dt )
+   self:update_project_buttons_with_drag( dt )   
    self.projects_frame:update( dt )
 end
 
@@ -145,6 +177,26 @@ end
 function ProjectsArea:mousereleased( x, y, button )
    self.projects_frame.drag_and_drop:mousereleased( x, y, button )
    -- return self.cursor_hovering 
+end
+
+function ProjectsArea:wheelmoved( x, y )
+   self.bounding_frame.zoom:wheelmoved( x, y )
+   if self.bounding_frame.zoom.total_scroll_distance >= 1 and
+      self.bounding_frame.zoom.total_scroll_distance <= #self.zoom_levels then
+	 self.current_zoom_level = self.zoom_levels[
+	    self.bounding_frame.zoom.total_scroll_distance]
+   else
+      -- inverse to zoom:wheelmoved()
+      self.bounding_frame.zoom.total_scroll_distance =
+	 self.bounding_frame.zoom.total_scroll_distance -
+	 self.bounding_frame.zoom.current_scroll_distance
+   end
+   print( self.current_zoom_level )
+   if self.bounding_frame.zoom.current_scroll_distance > 0 then
+      print( "Mouse wheel moved up" )      
+   elseif self.bounding_frame.zoom.current_scroll_distance < 0 then
+      print( "Mouse wheel moved down" )
+   end
 end
 
 -- function main_window.gen_add_remove_project_menu_on_click( x, y, button, istouch )

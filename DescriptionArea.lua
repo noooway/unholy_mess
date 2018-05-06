@@ -65,28 +65,41 @@ function DescriptionArea:new( o )
    }
    o.bounding_frame:add_widget( o.textfield )
    --
+   o.invisible = true or o.invisible
    o.widget_type = "DescriptionArea"
    return o
 end
 
 
 function DescriptionArea:update( dt )
+   if self.invisible then
+      return
+   end
    self.bounding_frame:update( dt )
 end
 
 
 function DescriptionArea:draw()
+   if self.invisible then
+      return
+   end
    self.bounding_frame:draw()
 end
 
 
 function DescriptionArea:mousereleased( x, y, button, istouch )
+   if self.invisible then
+      return
+   end
    self.project_title_widget:mousereleased( x, y, button, istouch )
    self.start_date_widget:mousereleased( x, y, button, istouch )
    self.end_date_widget:mousereleased( x, y, button, istouch )   
 end
 
 function DescriptionArea:textinput( t )
+   if self.invisible then
+      return
+   end
    self.project_title_widget:textinput( t )
    if self.project_title_widget.project_btn and
    self.project_title_widget.text ~= self.project_title_widget.project_btn.text then
@@ -98,6 +111,9 @@ function DescriptionArea:textinput( t )
 end
 
 function DescriptionArea:keyreleased( key, scancode )
+   if self.invisible then
+      return
+   end
    --same as textinput to catch backspace and del
    self.project_title_widget:keyreleased( key, scancode )
    if self.project_title_widget.project_btn and

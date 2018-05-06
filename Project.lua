@@ -17,4 +17,16 @@ function Project:add_subproject( sub )
    table.insert( self.subprojects, sub )
 end
 
+function Project:start_date_as_text()
+   return self.start_date["day"] .. "." ..
+      self.start_date["month"]  .. "." ..
+      self.start_date["year"]
+end
+
+function Project:end_date_as_text()
+   return self.end_date["day"] .. "." ..
+      self.end_date["month"]  .. "." ..
+      self.end_date["year"]
+end
+
 return Project

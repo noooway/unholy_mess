@@ -539,6 +539,64 @@ function DragAndDrop:mousereleased( x, y, button )
    end
 end
 
+
+-- Scroll extension
+
+local Scroll = {}
+Scroll.__index = Scroll
+
+function Scroll:new( o )
+   o = o or {}
+   setmetatable( o, self )
+   o.position = o.position or vector( 300, 300 )
+   o.width = o.width or 100
+   o.height = o.height or 50
+   o.cursor_hovering = o.cursor_hovering or false
+   o.total_scroll_distance = o.total_scrol_distance or 0
+   o.current_scroll_distance = o.current_scroll_distance or 0
+   return o
+end
+
+function Scroll:update( dt )
+   local mouse_pos = vector( love.mouse.getPosition() )
+   if self:inside( mouse_pos ) then
+      self.cursor_hovering = true
+   else
+      self.cursor_hovering = false
+   end
+end
+
+function Scroll:draw()
+   -- For debugging
+   local r, g, b, a = love.graphics.getColor()
+   love.graphics.setColor( 0, 255, 0, 150 )
+   love.graphics.rectangle( 'line',
+			    self.position.x,
+			    self.position.y,
+			    self.width,
+			    self.height )
+   love.graphics.print( "scroll frame",
+			self.position.x,
+			self.position.y )	 
+   love.graphics.setColor( r, g, b, a )
+end
+
+function Scroll:wheelmoved( x, y )
+   if self.cursor_hovering then
+      self.current_scroll_distance = y
+      self.total_scroll_distance = self.total_scroll_distance + y
+   end
+end
+
+function Scroll:inside( pos )
+   return
+      self.position.x < pos.x and
+      pos.x < ( self.position.x + self.width ) and
+      self.position.y < pos.y and
+      pos.y < ( self.position.y + self.height )
+end
+
+
 -- Update cursor
 
 local function update_cursor( widgets, default_cursor )
@@ -560,6 +618,7 @@ ui.DropdownMenu = DropdownMenu
 ui.Textfield = Textfield
 ui.Frame = Frame
 ui.DragAndDrop = DragAndDrop
+ui.Scroll = Scroll
 ui.update_cursor = update_cursor
 
 return ui

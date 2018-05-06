@@ -10,11 +10,20 @@ local Journal = require "Journal"
 local Project = require "Project"
 
 
+-- todo: move somewhere
+
+local function date_as_text( date_table )
+   return date_table["day"] .. "." ..
+      date_table["month"]  .. "." ..
+      date_table["year"]   
+end
+
 -- GUI
 local screen_w = love.graphics.getWidth()
 local screen_h = love.graphics.getHeight()
 
 local main_window = {}
+
 
 main_window.projects_area = ProjectsArea:new()
 main_window.description_area = DescriptionArea:new()
@@ -29,7 +38,7 @@ end
 
 function main_window.draw()
    main_window.projects_area:draw()
-   main_window.description_area:draw()
+   main_window.description_area:draw() 
 end
 
 
@@ -48,26 +57,31 @@ end
 function main_window.mousereleased( x, y, button, istouch )
    -- warning: order is important
    main_window.projects_area:mousereleased( x, y, button, istouch )
-   main_window.update_description_on_click( x, y, button, istouch )
+   main_window.show_description_on_click( x, y, button, istouch )
    -- main_window.gen_add_remove_project_menu_on_click( x, y, button, istouch )
    main_window.description_area:mousereleased( x, y, button, istouch )
 end
 
 
-function main_window.update_description_on_click( x, y, button, istouch )
+function main_window.show_description_on_click( x, y, button, istouch )
    for _, widget in ipairs(
       main_window.projects_area.projects_frame:children_of_type( "project" )) do
       if widget:mousereleased( x, y, button ) and ( button == 1 or button == 'l' ) then
+	 if main_window.description_area.invisible then
+	    main_window.description_area.invisible = false
+	    main_window.projects_area:resize_to_half_screen()
+	 end
 	 main_window.description_area.textfield:set_text( widget.project.description )
 	 main_window.description_area.project_title_widget:set_text( widget.project.name )
 	 main_window.description_area.project_title_widget.project_btn = widget 
-	 main_window.description_area.start_date_widget:set_text(widget.project.start_date)
-	 main_window.description_area.end_date_widget:set_text( widget.project.end_date )
+	 main_window.description_area.start_date_widget:set_text(
+	    date_as_text( widget.project.start_date ) )
+	 main_window.description_area.end_date_widget:set_text(
+	    date_as_text( widget.project.end_date ) )
 	 break
       end
    end
 end
-
 
 function main_window.update_cursor_type( dt )
    main_window.description_area.bounding_frame:update_cursor()
@@ -75,6 +89,11 @@ end
 
 
 function main_window.keyreleased( key, scancode )
+   if key == 'escape' then
+      main_window.description_area.invisible = true
+      main_window.projects_area:resize_to_full_screen()
+      return
+   end
    main_window.description_area:keyreleased( key, scancode )
 end
 
@@ -83,5 +102,9 @@ function main_window.textinput( t )
    main_window.description_area:textinput( t )
 end
 
+
+function main_window.wheelmoved( x, y )
+   main_window.projects_area:wheelmoved( x, y )
+end
 
 return main_window

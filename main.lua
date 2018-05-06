@@ -47,6 +47,10 @@ end
 --    main_window.mousemoved( x, y, dx, dy, istouch )
 -- end
 
+function love.wheelmoved( x, y )
+   main_window.wheelmoved( x, y )
+end
+
 
 function love.keyreleased( key, scancode )
    main_window.keyreleased( key, scancode )

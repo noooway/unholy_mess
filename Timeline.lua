@@ -64,8 +64,8 @@ function Timeline:new( o )
    o.current_date = os.date( "*t" )
    o.n_of_divisions = 31
    o:set_displayed_start_end_dates( o.current_date, o.timescale )
-   o.start_day = 1
-   o.end_day = 31   
+   -- o.start_day = 1
+   -- o.end_day = 31   
    o.day_width = o.button.width / o.n_of_divisions
    return o
 end
@@ -134,8 +134,8 @@ function Timeline:update_displayed_start_and_end_dates_wrt_drag(
    else
       self.days_shift = math.ceil( math.abs( total_x_shift ) / self.day_width )
    end
-   self.shifted_start_day = self.start_day + self.days_shift
-   self.shifted_end_day = self.end_day + self.days_shift
+   -- self.shifted_start_day = self.start_day + self.days_shift
+   -- self.shifted_end_day = self.end_day + self.days_shift
    local hours_in_days = 24
    local seconds_in_hour = 3600
    local days_shift_in_seconds = self.days_shift * hours_in_days * seconds_in_hour
@@ -263,22 +263,21 @@ function Timeline:determine_separating_lines()
 end
 
 
-local function determine_sundays()
-   -- todo
-   return {4, 11, 18, 25 }
-end
-
-
-
 function Timeline:compute_x_and_width_for_dates( proj_start_date, proj_end_date )
+   local seconds_in_day = 3600 * 24
+   local epoch_proj_start = os.time( proj_start_date )
+   local epoch_proj_end = os.time( proj_end_date )
+   local epoch_displayed_start_date = os.time( self.displayed_start_date )
+   local epoch_displayed_end_date = os.time( self.displayed_end_date )
+   -- todo: use math.floor for division
    local start_pos = self.button.position.x +
-      ( proj_start_date - self.start_day ) * self.day_width
+      ( epoch_proj_start - epoch_displayed_start_date ) / seconds_in_day * self.day_width
    local end_pos = self.button.position.x +
-      ( proj_end_date + 1 - self.start_day ) * self.day_width   
+      ( ( epoch_proj_end - epoch_displayed_start_date ) / seconds_in_day + 1 )
+      * self.day_width
    local width = end_pos - start_pos
    return start_pos, width
 end
-
 
 
 
